@@ -23,7 +23,7 @@ plot_x_min, plot_x_max = x_min - plot_margin, x_max + plot_margin
 plot_y_min, plot_y_max = y_min - plot_margin, y_max + plot_margin
 
 # Constants
-z_base = 0.3159  # meters
+z_base = 0.3541  # meters
 l_torso = 0.245  # meters
 l_ext = 0.05  # meters
 l_arm = 0.28 + 0.28 + 0.11  # meters

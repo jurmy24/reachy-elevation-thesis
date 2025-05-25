@@ -24,7 +24,7 @@ plot_x_min, plot_x_max = x_min - plot_margin, x_max + plot_margin
 plot_y_min, plot_y_max = y_min - plot_margin, y_max + plot_margin
 
 # Constants
-z_base = 0.37275  # meters
+# z_base = 0.3542  # meters
 l_torso = 0.245  # meters
 l_ext = 0.05  # meters
 l_arm = 0.28 + 0.28 + 0.11  # meters
@@ -32,14 +32,26 @@ x_origin = 0.0  # meters
 y_origin = 0.0  # meters
 
 # --- Optimization parameters ---
-target_area = 0.7  # m²
 pitch_for_optimization = 0  # degrees
+target_radius = 0.3  # meters
+target_area = 0.0  # m²
+if 0.2 >= target_radius:
+    # The circles don't overlap
+    A = 2 * np.pi * target_radius**2
+else:
+    # The circles overlap
+    print(f"Circles overlap, r={target_radius:.4f}m")
+    zeta = np.arccos(0.2 / target_radius)
+    target_area = 2 * np.pi * target_radius**2 - 2 * target_radius**2 * (
+        zeta - 0.5 * np.sin(2 * zeta)
+    )
+print(f"Target area: {target_area:.4f} m²")
 
 
 # Note that pitch is in degrees
 def contour_per_pitch(pitch: float, custom_z_base=None):
     # Use custom z_base if provided, otherwise use default
-    z_base_val = custom_z_base if custom_z_base is not None else z_base
+    z_base_val = custom_z_base
 
     # Convert pitch to radians
     pitch_rad = np.deg2rad(pitch)
@@ -208,3 +220,38 @@ print(f"\n--- Optimization Result ---")
 print(f"Target area: {target_area:.4f} m²")
 print(f"Optimal z_base: {optimal_z_base:.4f} m")
 print(f"Achieved area: {achieved_area:.4f} m²")
+
+# Create a new figure for the workspace area vs z_base plot
+plt.figure(figsize=(10, 6))
+
+# Generate z_base values to plot
+z_base_values = np.linspace(0.2401, l_arm - l_torso, 100)
+area_values = [
+    calculate_workspace_area(pitch=pitch_for_optimization, custom_z_base=z)
+    for z in z_base_values
+]
+
+# Plot the relationship
+plt.plot(z_base_values, area_values, "b-", label="Workspace Area")
+plt.axhline(
+    y=target_area,
+    color="r",
+    linestyle="--",
+    label=f"Target Area ({target_area:.4f} m²)",
+)
+plt.axvline(
+    x=optimal_z_base,
+    color="g",
+    linestyle="--",
+    label=f"Optimal z_r ({optimal_z_base:.4f} m)",
+)
+
+# Add labels and title
+plt.xlabel("z_r (m)")
+plt.ylabel("Workspace Area (m²)")
+# plt.title("Workspace Area vs z_base")
+plt.grid(True)
+plt.legend()
+
+# Show all plots
+plt.show()

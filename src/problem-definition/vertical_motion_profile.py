@@ -1,89 +1,82 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# S-curve motion profile: jerk-limited, no cruise phase (triangular profile)
+# Time vector setup for bang-bang motion (trapezoidal velocity profile)
+n = 100
+t_total = 6  # total time units
+t = np.linspace(0, t_total, n * t_total)
 
-# Parameters
-s_total = 0.6  # total distance (m)
-j_max = 0.3  # max jerk (m/s^3)
+# Define durations
+T_a = 2  # time to accelerate
+T_c = 2  # time at constant velocity
+T_d = 2  # time to decelerate
 
-# Compute Tj and total time
-Tj = (3 * s_total / (2 * j_max)) ** (1 / 3)
-T_total = 6 * Tj
-
-# Time vector
-dt = 0.001
-t = np.arange(0, T_total, dt)
-
-# Initialize profiles
-jerk = np.zeros_like(t)
+# Initialize acceleration, velocity, and position arrays
 acc = np.zeros_like(t)
 vel = np.zeros_like(t)
 pos = np.zeros_like(t)
 
-# Define segment times
-T1 = Tj
-T2 = T1 + Tj
-T3 = T2 + Tj
-T4 = T3 + Tj
-T5 = T4 + Tj
-T6 = T5 + Tj
+# Set acceleration value (normalized)
+a_max = 1
 
-# Build profiles
+# Define acceleration profile
 for i, ti in enumerate(t):
-    if ti < T1:
-        jerk[i] = j_max
-    elif ti < T2:
-        jerk[i] = 0
-    elif ti < T3:
-        jerk[i] = -j_max
-    elif ti < T4:
-        jerk[i] = -j_max
-    elif ti < T5:
-        jerk[i] = 0
-    elif ti < T6:
-        jerk[i] = j_max
+    if ti < T_a:
+        acc[i] = a_max
+    elif ti < T_a + T_c:
+        acc[i] = 0
+    else:
+        acc[i] = -a_max
 
-# Integrate jerk to get acceleration, velocity, position
-acc = np.cumsum(jerk) * dt
-vel = np.cumsum(acc) * dt
-pos = np.cumsum(vel) * dt
+# Integrate acceleration to get velocity
+vel = np.cumsum(acc) * (t[1] - t[0])
+# Integrate velocity to get position
+pos = np.cumsum(vel) * (t[1] - t[0])
 
-# Plot the profiles
-fig, axs = plt.subplots(4, 1, figsize=(10, 8), sharex=True)
+# Markers for phase boundaries
+phase_lines = [0, T_a, T_a + T_c, t_total]
 
-axs[0].plot(t, jerk, label="Jerk (m/s³)")
-axs[0].set_ylabel("Jerk")
+# Plotting
+fig, axs = plt.subplots(3, 1, figsize=(7, 6), sharex=True)
+
+# Calculate maximum values for scaling
+v_max = a_max * T_a  # maximum velocity
+# Total displacement = area under velocity curve
+# Area = (1/2 * T_a * v_max) + (T_c * v_max) + (1/2 * T_d * v_max)
+s_max = 0.5 * T_a * v_max + T_c * v_max + 0.5 * T_d * v_max  # maximum displacement
+
+axs[0].plot(t, pos, label="Displacement", color="blue")
+axs[0].set_ylabel("$s(t)$")
+axs[0].set_yticks([0, s_max / 2, s_max])
+axs[0].set_yticklabels(["$0$", "$\\frac{s_{max}}{2}$", "$s_{max}$"])
+axs[0].grid(True)
+# axs[0].set_title("n Profile")
+for line in phase_lines:
+    axs[0].axvline(x=line, color="gray", linestyle="--")
 axs[0].legend()
 
-axs[1].plot(t, acc, label="Acceleration (m/s²)", color="orange")
-axs[1].set_ylabel("Acceleration")
+axs[1].plot(t, vel, label="Velocity", color="green")
+axs[1].set_ylabel("$v(t)$")
+axs[1].set_yticks([0, v_max / 2, v_max])
+axs[1].set_yticklabels(["$0$", "$\\frac{v_{max}}{2}$", "$v_{max}$"])
+axs[1].grid(True)
+for line in phase_lines:
+    axs[1].axvline(x=line, color="gray", linestyle="--")
 axs[1].legend()
 
-axs[2].plot(t, vel, label="Velocity (m/s)", color="green")
-axs[2].set_ylabel("Velocity")
+axs[2].plot(t, acc, label="Acceleration", color="red")
+axs[2].set_xlabel("$t$")
+axs[2].set_ylabel("$a(t)$")
+axs[2].set_yticks([-a_max, 0, a_max])
+axs[2].set_yticklabels(["$-a_{max}$", "$0$", "$a_{max}$"])
+axs[2].grid(True)
+for line in phase_lines:
+    axs[2].axvline(x=line, color="gray", linestyle="--")
 axs[2].legend()
 
-axs[3].plot(t, pos, label="Position (m)", color="red")
-axs[3].set_ylabel("Position")
-axs[3].set_xlabel("Time (s)")
-axs[3].legend()
+# Set x-axis labels
+axs[2].set_xticks(phase_lines)
+axs[2].set_xticklabels(["$0$", "$T_a$", "$T_a + T_c$", "$T_{total}$"])
 
-plt.suptitle("Jerk-limited S-curve Motion Profile (no cruise)")
 plt.tight_layout()
 plt.show()
-
-# Average velocity
-# Using proper integration instead of just cumsum
-for i in range(1, len(t)):
-    acc[i] = acc[i - 1] + jerk[i] * dt
-    vel[i] = vel[i - 1] + acc[i] * dt
-    pos[i] = pos[i - 1] + vel[i] * dt
-
-# Scale position to ensure it reaches s_total
-scale_factor = s_total / pos[-1]
-pos = pos * scale_factor
-vel = vel * scale_factor
-v_avg = s_total / T_total
-print(f"Average velocity: {v_avg:.2f} m/s")
-print(f"Average velocity from v's: {np.average(vel):.2f} m/s")
