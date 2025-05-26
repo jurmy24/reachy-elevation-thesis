@@ -32,6 +32,30 @@ def dh_transform(theta, d, r, alpha):
     return T
 
 
+# Alternative direct calculation (for verification)
+def forward_kinematics_direct(theta1, theta2, theta3, l0, l1, l2, l3):
+    """
+    Direct calculation of forward kinematics for planar manipulator in xz plane.
+    This is equivalent to the DH method but more explicit for planar case.
+    """
+    # End-effector position in xz plane
+    x = (
+        l1 * math.cos(theta1)
+        + l2 * math.cos(theta1 + theta2)
+        + l3 * math.cos(theta1 + theta2 + theta3)
+    )
+    z = l0 + (
+        l1 * math.sin(theta1)
+        + l2 * math.sin(theta1 + theta2)
+        + l3 * math.sin(theta1 + theta2 + theta3)
+    )
+
+    # End-effector orientation
+    phi = theta1 + theta2 + theta3
+
+    return np.array([x, 0, z]), phi
+
+
 def forward_kinematics(theta1, theta2, theta3, l0, l1, l2, l3):
     """
     Calculate forward kinematics for 3-DOF planar manipulator in xz plane.
@@ -88,18 +112,34 @@ def forward_kinematics(theta1, theta2, theta3, l0, l1, l2, l3):
 def extract_position_orientation(T):
     """
     Extract position and orientation from transformation matrix.
-
-    Parameters:
-    T: 4x4 transformation matrix
-
-    Returns:
-    position: [x, y, z] coordinates
-    rotation_matrix: 3x3 rotation matrix
     """
     position = T[0:3, 3]
     rotation_matrix = T[0:3, 0:3]
 
     return position, rotation_matrix
+
+
+# Verification function
+def verify_calculations():
+    """Verify DH method against direct calculation."""
+    theta1, theta2, theta3 = math.pi / 4, math.pi / 6, -math.pi / 3
+    l0, l1, l2, l3 = 0.4, 1.0, 0.8, 0.6
+
+    # DH method
+    T_final, _ = forward_kinematics(theta1, theta2, theta3, l0, l1, l2, l3)
+    pos_dh, rot_dh = extract_position_orientation(T_final)
+
+    # Direct method
+    pos_direct, phi_direct = forward_kinematics_direct(
+        theta1, theta2, theta3, l0, l1, l2, l3
+    )
+
+    print("=== Verification ===")
+    print("DH method position:", pos_dh)
+    print("Direct method position:", pos_direct)
+    print("Position difference:", np.linalg.norm(pos_dh - pos_direct))
+    print(f"DH orientation angle: {math.atan2(rot_dh[1,0], rot_dh[0,0]):.4f} rad")
+    print(f"Direct orientation angle: {phi_direct:.4f} rad")
 
 
 # Example usage
@@ -150,52 +190,4 @@ if __name__ == "__main__":
         print(matrix)
         print()
 
-
-# Alternative direct calculation (for verification)
-def forward_kinematics_direct(theta1, theta2, theta3, l0, l1, l2, l3):
-    """
-    Direct calculation of forward kinematics for planar manipulator in xz plane.
-    This is equivalent to the DH method but more explicit for planar case.
-    """
-    # End-effector position in xz plane
-    x = (
-        l1 * math.cos(theta1)
-        + l2 * math.cos(theta1 + theta2)
-        + l3 * math.cos(theta1 + theta2 + theta3)
-    )
-    z = l0 + (
-        l1 * math.sin(theta1)
-        + l2 * math.sin(theta1 + theta2)
-        + l3 * math.sin(theta1 + theta2 + theta3)
-    )
-
-    # End-effector orientation
-    phi = theta1 + theta2 + theta3
-
-    return np.array([x, 0, z]), phi
-
-
-# Verification function
-def verify_calculations():
-    """Verify DH method against direct calculation."""
-    theta1, theta2, theta3 = math.pi / 4, math.pi / 6, -math.pi / 3
-    l0, l1, l2, l3 = 0.4, 1.0, 0.8, 0.6
-
-    # DH method
-    T_final, _ = forward_kinematics(theta1, theta2, theta3, l0, l1, l2, l3)
-    pos_dh, rot_dh = extract_position_orientation(T_final)
-
-    # Direct method
-    pos_direct, phi_direct = forward_kinematics_direct(
-        theta1, theta2, theta3, l0, l1, l2, l3
-    )
-
-    print("=== Verification ===")
-    print("DH method position:", pos_dh)
-    print("Direct method position:", pos_direct)
-    print("Position difference:", np.linalg.norm(pos_dh - pos_direct))
-    print(f"DH orientation angle: {math.atan2(rot_dh[1,0], rot_dh[0,0]):.4f} rad")
-    print(f"Direct orientation angle: {phi_direct:.4f} rad")
-
-
-verify_calculations()
+    verify_calculations()

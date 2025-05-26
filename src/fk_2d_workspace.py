@@ -34,23 +34,7 @@ def draw_links(theta1, theta2, theta3, l0, l1, l2, l3, ax):
     ax.plot(0, l0, "ko", markersize=8)  # Base joint
     ax.plot(pos1[0], pos1[2], "ko", markersize=8)  # Joint 1
     ax.plot(pos2[0], pos2[2], "ko", markersize=8)  # Joint 2
-    ax.plot(pos3[0], pos3[2], "ko", markersize=8)  # End-effector
-
-    # Draw torso orientation line at end-effector
-    torso_length = 0.1  # Length of the torso indicator line
-    # Calculate perpendicular direction based on the orientation
-    # The orientation is the sum of all joint angles
-    total_orientation = theta1 + theta2 + theta3
-    dx = np.cos(total_orientation) * torso_length
-    dz = np.sin(total_orientation) * torso_length
-    # Draw the torso line
-    ax.plot(
-        [pos3[0] - dx, pos3[0] + dx],
-        [pos3[2] - dz, pos3[2] + dz],
-        "m-",
-        linewidth=2,
-        label="Torso Orientation",
-    )
+    # ax.plot(pos3[0], pos3[2], "ko", markersize=8)  # End-effector
 
 
 def plot_workspace(l0, l1, l2, l3, num_points=10000):
