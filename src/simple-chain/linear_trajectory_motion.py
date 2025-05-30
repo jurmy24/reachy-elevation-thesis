@@ -38,14 +38,14 @@ def plot_mechanism(theta1, theta2, theta3, l0, l1, l2, l3, ax=None, color_offset
     return x3, z3
 
 
-def plot_trajectory(pitch_rad, color_offset, l0, l1, l2, l3, ax, num_steps=15):
+def plot_trajectory(pitch_rad, color_offset, l0, l1, l2, l3, ax, num_steps=7):
     """Plot trajectory for a given pitch angle."""
     # Convert pitch to the correct phi value
     # pitch = 0° means pointing vertically upward (phi = pi/2)
     # pitch > 0° means tilted forward from vertical
     phi = np.pi / 2 - pitch_rad  # pi/2 is vertical, positive pitch tilts forward
 
-    z_values = np.linspace(0.15, 0.7, num_steps)
+    z_values = np.linspace(0.3541, 0.9701, num_steps)
 
     end_effector_x = []
     end_effector_z = []
@@ -75,25 +75,25 @@ def plot_trajectory(pitch_rad, color_offset, l0, l1, l2, l3, ax, num_steps=15):
             break
 
     # Plot end-effector trajectory
-    colors = ["blue", "green", "red"]
-    color = colors[color_offset % len(colors)]
-    ax.plot(
-        end_effector_x,
-        end_effector_z,
-        "o-",
-        color=color,
-        linewidth=3,
-        markersize=3,
-        alpha=0.8,
-        label=f"End-effector (pitch={int(round(np.rad2deg(pitch_rad)))}°)",
-    )
+    # colors = ["blue", "green", "red"]
+    # color = colors[color_offset % len(colors)]
+    # ax.plot(
+    #     end_effector_x,
+    #     end_effector_z,
+    #     "o-",
+    #     color=color,
+    #     linewidth=3,
+    #     markersize=3,
+    #     alpha=0.8,
+    #     label=f"End-effector (pitch={int(round(np.rad2deg(pitch_rad)))}°)",
+    # )
 
     return end_effector_x, end_effector_z
 
 
 def main():
     # Link lengths
-    l0, l1, l2, l3 = 0.05, 0.4, 0.4, 0.05
+    l0, l1, l2, l3 = 0.2901, 0.4, 0.4, 0.05
 
     # Create three separate subplots
     fig, axes = plt.subplots(1, 3, figsize=(14, 6))
@@ -119,17 +119,18 @@ def main():
         ax.set_xlabel("X (m)", fontsize=12)
         ax.set_ylabel("Z (m)", fontsize=12)
         ax.set_title(
-            f"Pitch Angle: {int(round(np.rad2deg(pitch_rad)))}°\n(15 configurations)",
+            f"Pitch Angle: {int(round(np.rad2deg(pitch_rad)))}°\n(7 configurations)",
             fontsize=14,
         )
         ax.legend(fontsize=10)
 
         # Add a vertical reference line at x=0
         ax.axvline(x=0, color="black", linestyle="--", alpha=0.5, linewidth=1)
+        ax.axhline(y=0, color="black", linestyle="--", alpha=0.5, linewidth=1)
 
         # Set reasonable limits
         ax.set_xlim(-0.5, 0.5)
-        ax.set_ylim(-0.2, 0.8)
+        ax.set_ylim(-0.2, 1.0)
 
     plt.tight_layout()
     plt.show()

@@ -85,7 +85,7 @@ if __name__ == "__main__":
     phi = 0.0  # Target phi = 0 radians
 
     # Link lengths
-    l0, l1, l2, l3 = 0.05, 0.4, 0.4, 0.05
+    l0, l1, l2, l3 = 0.2901, 0.4, 0.4, 0.05
 
     # Compute IK solutions
     analytical_solution = analytical_ik(xd, zd, phi, l0, l1, l2, l3)

@@ -150,10 +150,10 @@ if __name__ == "__main__":
     theta3 = -math.pi / 3  # -60 degrees
 
     # Define link lengths
-    l0 = 0.4
-    l1 = 1.0
-    l2 = 0.8
-    l3 = 0.6
+    l0 = 0.2901
+    l1 = 0.4
+    l2 = 0.4
+    l3 = 0.05
 
     # Calculate forward kinematics
     T_final, T_matrices = forward_kinematics(theta1, theta2, theta3, l0, l1, l2, l3)

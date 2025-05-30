@@ -97,7 +97,7 @@ def plot_workspace(l0, l1, l2, l3, num_points=10000):
 
 if __name__ == "__main__":
     # Define link lengths (same as in fk.py example)
-    l0 = 0.05  # base height
+    l0 = 0.2901  # base height
     l1 = 0.4  # first link
     l2 = 0.4  # second link
     l3 = 0.05  # third link
