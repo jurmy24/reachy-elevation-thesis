@@ -45,10 +45,10 @@ v_max = a_max * T_a  # maximum velocity
 # Area = (1/2 * T_a * v_max) + (T_c * v_max) + (1/2 * T_d * v_max)
 s_max = 0.5 * T_a * v_max + T_c * v_max + 0.5 * T_d * v_max  # maximum displacement
 
-axs[0].plot(t, pos, label="Displacement", color="blue")
-axs[0].set_ylabel("$s(t)$")
+axs[0].plot(t, pos, label="Position", color="blue")
+axs[0].set_ylabel("$z_{ee}(t)$")
 axs[0].set_yticks([0, s_max / 2, s_max])
-axs[0].set_yticklabels(["$0$", "$\\frac{s_{max}}{2}$", "$s_{max}$"])
+axs[0].set_yticklabels(["$0$", "$\\frac{z_{ee,max}}{2}$", "$z_{ee,max}$"])
 axs[0].grid(True)
 # axs[0].set_title("n Profile")
 for line in phase_lines:
@@ -56,9 +56,9 @@ for line in phase_lines:
 axs[0].legend()
 
 axs[1].plot(t, vel, label="Velocity", color="green")
-axs[1].set_ylabel("$v(t)$")
+axs[1].set_ylabel("$\\dot{z}_{ee}(t)$")
 axs[1].set_yticks([0, v_max / 2, v_max])
-axs[1].set_yticklabels(["$0$", "$\\frac{v_{max}}{2}$", "$v_{max}$"])
+axs[1].set_yticklabels(["$0$", "$\\frac{\\dot{z}_{ee,max}}{2}$", "$\\dot{z}_{ee,max}$"])
 axs[1].grid(True)
 for line in phase_lines:
     axs[1].axvline(x=line, color="gray", linestyle="--")
@@ -66,9 +66,9 @@ axs[1].legend()
 
 axs[2].plot(t, acc, label="Acceleration", color="red")
 axs[2].set_xlabel("$t$")
-axs[2].set_ylabel("$a(t)$")
+axs[2].set_ylabel("$\\ddot{z}_{ee}(t)$")
 axs[2].set_yticks([-a_max, 0, a_max])
-axs[2].set_yticklabels(["$-a_{max}$", "$0$", "$a_{max}$"])
+axs[2].set_yticklabels(["$-\\ddot{z}_{ee,max}$", "$0$", "$\\ddot{z}_{ee,max}$"])
 axs[2].grid(True)
 for line in phase_lines:
     axs[2].axvline(x=line, color="gray", linestyle="--")

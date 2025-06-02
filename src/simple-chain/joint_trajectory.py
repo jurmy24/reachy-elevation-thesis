@@ -77,18 +77,35 @@ def compute_joint_trajectory(t, z_trajectory, phi_des, robot_params, initial_gue
     return np.array(theta_list)
 
 
-def compute_joint_velocities(theta_list, dt):
+def compute_joint_velocities(theta_list, z_dot, robot_params):
     """
-    Compute joint velocities using finite difference.
+    Compute joint velocities using the Jacobian relationship.
 
     Args:
         theta_list: Joint angles array
-        dt: Time step
+        z_dot: Cartesian velocity in z
+        robot_params: Robot link lengths
 
     Returns:
         np.array: Joint velocities
     """
-    return np.gradient(theta_list, dt, axis=0)
+    l0, l1, l2, l3 = robot_params
+    theta_dot_list = []
+
+    for i in range(len(theta_list)):
+        J = calculate_jacobian(
+            theta_list[i][0], theta_list[i][1], theta_list[i][2], l0, l1, l2, l3
+        )
+
+        # Cartesian velocities
+        dx = np.array([0, z_dot[i], 0])
+
+        # Solve for joint velocities using the Jacobian
+        J_inv = np.linalg.pinv(J)
+        dtheta = J_inv @ dx
+        theta_dot_list.append(dtheta)
+
+    return np.array(theta_dot_list)
 
 
 def compute_joint_accelerations(
@@ -178,26 +195,39 @@ def plot_results(t, theta_list, theta_dot_list, theta_ddot_list):
     # Joint angles
     plt.subplot(3, 1, 1)
     for i in range(3):
-        plt.plot(t, theta_list[:, i], label=f"$\\theta_{i+1}$")
+        plt.plot(t, theta_list[:, i], label=f"$\\theta_{i+1}$", linewidth=3.0 - i * 0.6)
     plt.ylabel("Joint Angles (rad)")
-    plt.grid()
+    plt.grid(True, which="both", linestyle="-", alpha=0.2)
+    plt.minorticks_on()
     plt.legend()
 
     # Joint velocities
     plt.subplot(3, 1, 2)
     for i in range(3):
-        plt.plot(t, theta_dot_list[:, i], label=f"$\\dot{{\\theta}}_{i+1}$")
+        plt.plot(
+            t,
+            theta_dot_list[:, i],
+            label=f"$\\dot{{\\theta}}_{i+1}$",
+            linewidth=3.0 - i * 0.6,
+        )
     plt.ylabel("Joint Velocities (rad/s)")
-    plt.grid()
+    plt.grid(True, which="both", linestyle="-", alpha=0.2)
+    plt.minorticks_on()
     plt.legend()
 
     # Joint accelerations
     plt.subplot(3, 1, 3)
     for i in range(3):
-        plt.plot(t, theta_ddot_list[:, i], label=f"$\\ddot{{\\theta}}_{i+1}$")
+        plt.plot(
+            t,
+            theta_ddot_list[:, i],
+            label=f"$\\ddot{{\\theta}}_{i+1}$",
+            linewidth=3.0 - i * 0.6,
+        )
     plt.ylabel("Joint Accelerations (rad/s²)")
     plt.xlabel("Time (s)")
-    plt.grid()
+    plt.grid(True, which="both", linestyle="-", alpha=0.2)
+    plt.minorticks_on()
     plt.legend()
 
     plt.tight_layout()
@@ -227,8 +257,8 @@ def main():
     initial_guess = [0.0, 0.0, np.pi / 2 - 0.0]
     theta_list = compute_joint_trajectory(t, z, phi_des, robot_params, initial_guess)
 
-    # Compute joint velocities
-    theta_dot_list = compute_joint_velocities(theta_list, dt)
+    # Compute joint velocities using Jacobian
+    theta_dot_list = compute_joint_velocities(theta_list, zdot, robot_params)
 
     # Compute joint accelerations
     theta_ddot_list = compute_joint_accelerations(

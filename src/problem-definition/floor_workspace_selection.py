@@ -243,11 +243,11 @@ plt.axvline(
     x=optimal_z_base,
     color="g",
     linestyle="--",
-    label=f"Optimal z_r ({optimal_z_base:.4f} m)",
+    label=rf"Optimal $z_{{ee}}$ ({optimal_z_base:.4f} m)",
 )
 
 # Add labels and title
-plt.xlabel("z_r (m)")
+plt.xlabel(r"$z_{ee}$ (m)")
 plt.ylabel("Workspace Area (m²)")
 # plt.title("Workspace Area vs z_base")
 plt.grid(True)

@@ -77,20 +77,20 @@ def plot_workspace(l0, l1, l2, l3, num_points=10000):
     # Add labels and title
     plt.xlabel("X (m)")
     plt.ylabel("Z (m)")
-    plt.title("2D Workspace of 3-DOF Planar Manipulator")
+    # plt.title("2D Workspace of 3-DOF Planar Manipulator")
     plt.grid(True)
     plt.axis("equal")
     plt.legend()
 
-    # Add link lengths to the plot
-    plt.text(
-        0.02,
-        0.98,
-        f"Link lengths:\nl0 = {l0:.2f}m\nl1 = {l1:.2f}m\nl2 = {l2:.2f}m\nl3 = {l3:.2f}m",
-        transform=plt.gca().transAxes,
-        verticalalignment="top",
-        bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
-    )
+    # # Add link lengths to the plot
+    # plt.text(
+    #     0.02,
+    #     0.98,
+    #     f"Link lengths:\nl0 = {l0:.2f}m\nl1 = {l1:.2f}m\nl2 = {l2:.2f}m\nl3 = {l3:.2f}m",
+    #     transform=plt.gca().transAxes,
+    #     verticalalignment="top",
+    #     bbox=dict(boxstyle="round", facecolor="white", alpha=0.8),
+    # )
 
     return plt
 
